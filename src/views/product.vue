@@ -1,7 +1,7 @@
 <template>
    <div class="product">
        <!-- 导航 -->
-      <tab-nav :h_menu="h_menu" :logo="logo"  :total_price="total_price" :is_login="is_login"></tab-nav>
+      <tab-nav :tab="tab"></tab-nav>
       <!-- 产品title -->
       <div class="product_title">
           <div class="product_title_content">PRODUCTS</div>
@@ -12,7 +12,7 @@
               <div class="shop_l">
                   <div class="shop_l_list">Product Categories</div>
                   <div class="shop_l_list" v-for="(item,index) in category" :key="index" @click="cateClick(index,item.id)">
-                    <span :class="cateIndex==index?'active':''">{{item.name}}</span>
+                    <span :class="cateIndex==item.id ?'active':''">{{item.name}}</span>
                   </div>
               </div>
               <div class="shop_r">
@@ -131,7 +131,7 @@ export default {
             currentPage1:0,
             el_menu:'DEFAULT SPORT',
             el_menus:'desc',
-            h_menu:[],
+            // h_menu:[],
             sort:[
               {
                 name:'DEFAULT SPORT'
@@ -183,10 +183,15 @@ export default {
             cart_num:0,
             total_price:'',
             spec_goods:[],
-            cat_id:'',
+            cat_id:0,
             cateIndex:0,
             is_login:false,
-            bottom:[]
+            bottom:[],
+            tab:{
+            is_login:false,
+            h_menu:[],
+            logo:''
+         }
         }
     },
     components:{
@@ -232,6 +237,7 @@ export default {
             })
       },
         cateClick(index,id){
+          this.$router.push({path:'/product',query:{cat_id:id}})
           this.cateIndex=index
           this.cat_id=id
            this.$ajax({
@@ -293,7 +299,7 @@ export default {
             }).then(res=>{
                 this.cart_num=res.cart_list.length
                 console.log(this.cart_num)
-                this.total_price=res.sum_price
+                this.tab.total_price=res.sum_price
             })
         },
         handleCurrentChange(page){
@@ -377,9 +383,9 @@ export default {
                  
                 }
             }).then(res=>{
-               this.h_menu=res.data.h_menu
+               this.tab.h_menu=res.data.h_menu
                console.log(this.h_menu)
-               this.logo=res.data.logo
+               this.tab.logo=res.data.logo
             })
       },
      
@@ -402,9 +408,10 @@ export default {
                 }
             }).then(res=>{
                this.goodsList=res.goods_list,
-               console.log(this.goodsList[0].spec_goods_price)
-               console.log(this.goodsList[0].original_img)
+              //  console.log(this.goodsList[0].spec_goods_price)
+              //  console.log(this.goodsList[0].original_img)
                this.category=res.category,
+               console.log(this.category)
                this.sum_page=res.sum_page,
                this.spec_color=res.spec_list[1].spec_item
                this.spec_goods=res.spec_goods_price
@@ -415,18 +422,21 @@ export default {
       }
     },
     created(){
+      console.log(this.cateIndex)
       var token=localStorage.getItem('login')
-      this.cat_id=this.$route.query.cat_id
+        this.cat_id=this.$route.query.cat_id
       console.log(this.cat_id)
-      if(this.$route.query.cat_id!=0){
+    
+      if(this.cat_id!=undefined){
         this.cateIndex=this.$route.query.cat_id
+        this.cat_id=this.$route.query.cat_id
       }else{
         this.cateIndex=0
       }
       if(token==''){
-       this.is_login=false
+       this.tab.is_login=false
      }else{
-       this.is_login=true
+       this.tab.is_login=true
      }
       this.getData();
       this.getGoodsList();

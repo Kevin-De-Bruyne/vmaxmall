@@ -1,7 +1,7 @@
 <template>
    <div class="news">
        <!-- 导航栏 -->
-     <tab-nav :h_menu="h_menu" :logo="logo"></tab-nav>
+     <tab-nav :tab="tab"></tab-nav>
       <!-- 新闻部分 -->
       <div class="news_whole">
           <div class="news_t">NEWS</div>
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import {mapMutations,mapActions} from 'vuex'
 import TabNav from "../components/TabNav.vue"
 import Bottom from '../components/bottom.vue'
 
@@ -46,7 +47,14 @@ export default{
             news:[],
             h_menu:[],
             logo:'',
-            bottom:[]
+            bottom:[],
+            tab:{
+            // total_price:'',
+            // cart_nums:'',
+            is_login:false,  
+            logo:'',
+            h_menu:[]
+         }
         }
     },
     components:{
@@ -54,6 +62,7 @@ export default{
       Bottom
     },
     methods:{
+      ...mapActions(['getdata_cart','getdata_home']),
         handleSizeChange(){
 
         },  
@@ -90,15 +99,22 @@ export default{
                  
                 }
             }).then(res=>{
-               this.h_menu=res.data.h_menu
+               this.tab.h_menu=res.data.h_menu
                console.log(this.h_menu)
-               this.logo=res.data.logo
+               this.tab.logo=res.data.logo
             })
         }
     },
     created(){
+       var token=localStorage.getItem('login')
+      if(token==''){
+       this.tab.is_login=false
+     }else{
+       this.tab.is_login=true
+     }
       this.getData();
       this.getNav();
+      this.getdata_home();
       this.getBottom();
     }
 }

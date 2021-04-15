@@ -1,7 +1,7 @@
 <template>
      <div class="nav">
         <div class="nav_whole">
-          <div class="nav_l"><img :src="htp+logo" alt=""></div>
+          <div class="nav_l"><img :src="htp+tab.logo" alt=""></div>
           <div class="nav_c">
             <div class="nav_list_whole">
               <!-- <div class="nav_list" v-if="$route.path=='/home'"  @click="GoHome"><span style="color:rgb(149,149,149);">HOME</span></div>
@@ -36,7 +36,7 @@
               <div class="nav_list" @click="GoFAQs"  v-else><span>FAQS</span></div>
               <div class="nav_list" @click="GoContact"  v-if="$route.path=='/contact'"><span style="color:rgb(149,149,149);">CONTACT</span></div>
               <div class="nav_list" @click="GoContact"  v-else><span>CONTACT</span></div> -->
-              <div class="nav_list" v-for="(menu,index) in  h_menu" :key="index" @click="navClick(menu.path)">
+              <div class="nav_list" v-for="(menu,index) in  tab.h_menu" :key="index" @click="navClick(menu.path)">
                 <span>{{menu.name}}</span>
                 <span class="iconfont icon-xiala" v-if="index==1"></span>
                   <div class="mouseover" v-if="index==1" @click.stop="aa">
@@ -57,7 +57,7 @@
              <div class="previous_number">{{cart_num}}</div>
             </div>
             <div class="total_prices" style="font-size:14px;margin-left:8px;font-weight:bold;"><span>${{cart_money}}</span></div>
-            <div class="logAndReg" v-if="is_login==false">
+            <div class="logAndReg" v-if="tab.is_login==false">
               <div class="logAndReg_l" @click="goLogin">Login /</div>
               <div class="logAndReg_r" @click="goReg">Regsiter</div>
             </div>
@@ -103,7 +103,16 @@ export default {
          goods_name:''
      }
  },
- props:['currentIndex','h_menu','logo',"total_price","is_login","cart_nums"],
+ props:{
+   tab:{
+    //  currentIndex:'',
+    //  h_menu:'',
+    //  logo:'',
+    //  total_price:'',
+    //  is_login:'',
+    //  cart_nums:''
+   }
+ },
  created(){
   //  this.cart_num=this.$store.state.cart_num
  },
@@ -134,7 +143,7 @@ export default {
         this.$router.push('/login')
       },
       navClick(path){
-        this.$router.push({path:path,query:{cat_id:0}})
+        this.$router.push(path)
         this.$emit('navClick',path)
       },
       searchGoods(){

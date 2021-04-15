@@ -1,7 +1,7 @@
 <template>
   <div class="FAQ">
       <!-- 导航栏 -->
-      <tab-nav :h_menu="h_menu" :logo="logo"></tab-nav>
+      <tab-nav :tab="tab"></tab-nav>
       <div class="faqWhole">
           <div class="faq_title"> FAQs</div>
           <div class="faq_content">
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import {mapMutations,mapActions} from 'vuex'
 import TabNav from '../components/TabNav.vue'
 import Bottom from '../components/bottom.vue'
 export default {
@@ -34,10 +35,18 @@ export default {
           faqs:[],
           faqsIndex:0,
           logo:'',
-          bottom:[]
+          bottom:[],
+          tab:{
+            // total_price:'',
+            // cart_nums:'',
+            is_login:false,  
+            logo:'',
+            h_menu:[]
+         }
         }
     },
     methods:{
+       ...mapActions(['getdata_cart','getdata_home']),
        getBottom(){
         this.$ajax({
                 url:'/api/index/bottom',
@@ -57,9 +66,9 @@ export default {
                 }
             }).then(res=>{
                this.banner=res.data.banner
-               this.h_menu=res.data.h_menu
+               this.tab.h_menu=res.data.h_menu
                console.log(this.h_menu),
-               this.logo=res.data.logo
+               this.tab.logo=res.data.logo
             })
       },
       faqsClick(index){
@@ -77,8 +86,15 @@ export default {
       }
     },
     created(){
+       var token=localStorage.getItem('login')
+      if(token==''){
+       this.tab.is_login=false
+     }else{
+       this.tab.is_login=true
+     }
       this.getNav();
       this.getData();
+       this.getdata_home();
       this.getBottom();
     }
 }

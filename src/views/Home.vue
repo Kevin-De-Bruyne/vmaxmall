@@ -1,12 +1,12 @@
 <template>
   <div class="home">
     <!-- 导航栏 -->
-       <tab-nav :h_menu="h_menu" :logo="logo" :cart_nums="cart_nums" :total_price="total_price" :is_login="is_login" @navClick="navClick"/>
+       <tab-nav :tab="tab"/>
        <el-carousel indicator-position="inside" trigger="click"> 
         <el-carousel-item v-for="(item,index) in  banner" :key="index">
           <!-- <h3>{{ item }}</h3> -->
           <img :src="htp+item.path" alt="">
-          <div class="click_here" @click="clickHere">Click Here
+          <div class="click_here" @click="$router.push(item.url)">Click Here
             <span class="iconfont icon-arrow_right"></span>
           </div>
         </el-carousel-item>
@@ -25,7 +25,7 @@
       <!-- PRODUCT -->
       <div class="product">
         <div class="product_whole">
-          <div class="product_t">Screen Protector Film Series</div>
+          <div class="product_t">Phone Cases Cover Series</div>
           <!-- <div class="product_c">PROTECTIVE FILM WITH A LIFETIME WARRANTY.</div> -->
           <div class="product_b">
             <div class="product_list" v-for="(item,index) in goods" :key='index'>
@@ -49,13 +49,13 @@
       </div>
       <!-- choose type -->
       <div class="choose_type">
-        Phone Cases Cover Series
+        Screen Protector Film Series
       </div>
       <!-- 保护膜 -->
       <div class="protect_mo">
         <div class="protect_whole">
-          <div class="protect_list" v-for="(item,index) in category" :key="index">
-            <div class="protect_list_t" @click="productClick(item.id)">
+          <div class="protect_list" v-for="(item,index) in category" :key="index"  @click="productClick(item.id)">
+            <div class="protect_list_t">
               <div class="protect_list_img">
                 <img :src="htp+item.image" alt="">
               </div>
@@ -72,15 +72,21 @@
         <div class="case_l" :style="`background:url(${htp+left_img})`"></div>
         <div class="case_r">
           <div class="case_r_whole">
-            <div class="case_r_t"><span class="iconfont icon-quotation"></span></div>  
+            <!-- <div class="case_r_t"><span class="iconfont icon-quotation"></span></div>   -->
             <!-- <div class="case_r_c1">只是让您知道我们今天已经收到货物，所有货物已经入账。感谢您的服务是与您开展服务的荣幸。</div>
             <div class="case_r_c2">安东尼.巴斯塔</div> -->
             <div class="case_r_content">
               <el-carousel indicator-position="inside" trigger="click"> 
              <el-carousel-item v-for="(item,index) in image_text" :key="index">
               <!-- <h3>{{ item }}</h3> -->
-               <div class="case_r_c1">{{item.content}}</div>
-               <div class="case_r_c2">{{item.author}}</div>
+               <div class="case_r_c1">
+                 <span>{{item.content}}</span>
+                
+               </div>
+               <div class="case_r_c2">
+                 <span>{{item.author}}</span>
+                 <img :src="htp+item.s_path" alt="">
+               </div>
             </el-carousel-item>
             </el-carousel>
             </div>
@@ -125,7 +131,7 @@
         <div class="news_whole">
           <div class="news_t">JOIN US AND WATCH OUR NEWS</div>
           <div class="news_c">
-            <div class="news_c_list" v-for="(item,index) in our_news" :key="index">
+            <div class="news_c_list" v-for="(item,index) in our_news" :key="index" @click="$router.push('/news')">
               <div class="news_c_list_t"><img :src="htp+item.path" alt=""></div>
               <div class="news_b">
                 <div class="news_b1">{{item.title}}</div>
@@ -181,9 +187,13 @@ export default {
       email:'',
       country:'',
       content:'',
-      cart_nums:'',
-      total_price:'',
-      is_login:false,
+      tab:{
+        // total_price:'',
+        // cart_nums:'',
+        is_login:false,
+        h_menu:[],
+        logo:''
+      },
       enterprise:'',
       video_list:[]
       }
@@ -211,9 +221,9 @@ export default {
    created(){
      var token=localStorage.getItem('login')
      if(token==''){
-       this.is_login=false
+       this.tab.is_login=false
      }else{
-       this.is_login=true
+       this.tab.is_login=true
      }
      this.getData();
      this.getBottom();
@@ -223,7 +233,7 @@ export default {
    methods:{
      ...mapActions(['getdata_cart','getdata_home']),
      goDiscover(){
-       this.$router.push({path:'/product',query:{cat_id:0}})
+       this.$router.push('/product')
      },
      navClick(path){
        console.log(path)
@@ -232,7 +242,7 @@ export default {
        this.$router.push({path:'/product',query:{cat_id:id}})
      },
      clickHere(){
-       this.$router.push({path:'/product',query:{cat_id:0}})
+       this.$router.push('/product')
      },
       search(){
         this.close=true
@@ -253,7 +263,7 @@ export default {
             }).then(res=>{
                 this.cart_num=res.cart_list.length
                 console.log(this.cart_num)
-                this.total_price=res.sum_price
+                this.tab.total_price=res.sum_price
             })
         },
       sendMessage(){
@@ -294,8 +304,8 @@ export default {
                 }
             }).then(res=>{
                this.banner=res.data.banner
-               this.h_menu=res.data.h_menu
-               this.logo=res.data.logo,
+               this.tab.h_menu=res.data.h_menu
+               this.tab.logo=res.data.logo,
                this.goods=res.data.goods
                this.central_news=res.data.central_news
                this.image_text=res.data.image_text
@@ -303,8 +313,8 @@ export default {
                this.category=res.data.category,
                this.our_news=res.data.our_news,
                this.enterprise=res.data.enterprise
-               this.cart_nums=res.data.cart_num,
-               this.total_price=res.data.cart_money
+               this.tab.cart_nums=res.data.cart_num,
+               this.tab.total_price=res.data.cart_money
                this.video_list=res.data.video_list
             })
       },
@@ -561,12 +571,17 @@ export default {
               height: 300px;
               margin: 0 15px;
               width: 300px;
+              background: #000;
               img{
                 max-width: 100%;
                 min-height: 100%;
                 min-width: 100%;
                 max-height: 100%;
               }
+            }
+            .product_list_t:hover>img{
+              transform:scale(1.1);
+              //  opacity:0.6; filter: alpha(opacity=60);
             }
             .product_list_b{
               padding-top: 30px;
@@ -688,9 +703,13 @@ export default {
       z-index: 1200;
       justify-content: center;
       .protect_whole{
-        width: 75%;
-        margin-top: 30px;
+      width: 75%;
+      margin-top: 30px;
       display: flex;
+    
+      .protect_list:hover{
+        cursor: pointer;
+      }
         .protect_list{
           flex: 1;
           display: flex;
@@ -718,7 +737,7 @@ export default {
           .protect_list_c{
             margin-top: 35px;
             text-align: center;
-            font-size: 25px;
+            font-size: 21px;
             font-weight: bold;
           }
           .protect_list_b{
@@ -815,7 +834,7 @@ export default {
                margin:0;
                width: 100%;
                 // width: 666px;
-              height: 200px;
+              height: 270px;
             }
             /deep/ .el-carousel__container{
                margin:0;
@@ -833,14 +852,26 @@ export default {
             margin-top: 35px;
             // font-size: 10px;
             text-align: center;
-            color:rgb(133,133,133)
+            color:rgb(133,133,133);
+            display: flex;
+            flex-direction: row;
+            
           }
            .case_r_c2{
             margin-top: 35px;
             // font-size: 10px;
             text-align: center;
             font-weight: bold;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            // padding-bottom: 40px;
             // color:rgb(133,133,133)
+            img{
+              width: 130px;
+              height: 130px;
+            }
           }
         }
 
@@ -995,6 +1026,9 @@ export default {
               display: flex;
               margin-top: 30px;
               justify-content: space-around;
+              .news_c_list{
+                cursor: pointer;
+              }
               .news_c_list{
                 // flex: 1;
                 margin: 0 15px;
